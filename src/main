@@ -1,0 +1,94 @@
+import argparse
+from pathlib import Path
+import cv2
+import numpy as np
+
+def load(path):
+    img=cv2.imread(str(path))
+    if img is None: raise FileNotFoundError(f"Cannot read image: {path}")
+    return img
+
+def save(path,img):
+    path.parent.mkdir(parents=True,exist_ok=True)
+    if not cv2.imwrite(str(path),img): raise IOError(f"Could not write: {path}")
+
+def roi_mask(shape):
+    h,w=shape.shape[:2]; m=np.zeros((h,w),np.uint8)
+    poly=np.array([[(int(.03*w),h),(int(.28*w),int(.39*h)),
+                    (int(.72*w),int(.39*h)),(int(.97*w),h)]],np.int32)
+    cv2.fillPoly(m,poly,255); return m
+
+def main():
+    ap=argparse.ArgumentParser(description="Road Surface and Lane Geometry Analyzer")
+    ap.add_argument("--input",required=True); ap.add_argument("--output",default="results")
+    ap.add_argument("--low",type=int,default=45); ap.add_argument("--high",type=int,default=135)
+    a=ap.parse_args(); out=Path(a.output); img=load(a.input)
+
+    gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+    blur=cv2.GaussianBlur(gray,(5,5),1.1)
+    gx=cv2.Sobel(blur,cv2.CV_32F,1,0,3); gy=cv2.Sobel(blur,cv2.CV_32F,0,1,3)
+    energy=cv2.normalize(cv2.magnitude(gx,gy),None,0,255,cv2.NORM_MINMAX).astype(np.uint8)
+    edge=cv2.Canny(blur,a.low,a.high)
+    mask=roi_mask(gray); roi=cv2.bitwise_and(edge,mask)
+
+    # Lane-like Hough segments
+    lane_img=img.copy()
+    lines=cv2.HoughLinesP(roi,1,np.pi/180,45,minLineLength=65,maxLineGap=25)
+    seg=[]
+    if lines is not None:
+        for x1,y1,x2,y2 in lines[:,0]:
+            length=float(np.hypot(x2-x1,y2-y1))
+            angle=float(np.degrees(np.arctan2(y2-y1,x2-x1)))
+            if 20<=abs(angle)<=88:
+                cv2.line(lane_img,(x1,y1),(x2,y2),(0,255,0),3); seg.append(length)
+
+    # Locally dark candidate regions
+    local=cv2.GaussianBlur(gray,(15,15),0)
+    dark=cv2.subtract(local,gray)
+    _,binary=cv2.threshold(dark,14,255,cv2.THRESH_BINARY)
+    binary=cv2.bitwise_and(binary,mask)
+    k=np.ones((5,5),np.uint8)
+    binary=cv2.morphologyEx(binary,cv2.MORPH_OPEN,k)
+    binary=cv2.morphologyEx(binary,cv2.MORPH_CLOSE,k)
+    contours,_=cv2.findContours(binary,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+    candidates=[]
+    defect_img=img.copy()
+    for c in contours:
+        area=cv2.contourArea(c)
+        if 60<=area<=18000:
+            candidates.append(area); cv2.drawContours(defect_img,[c],-1,(0,0,255),2)
+
+    # Bird's-eye transform
+    Hh,Ww=gray.shape
+    src=np.float32([[.28*Ww,.39*Hh],[.72*Ww,.39*Hh],[.97*Ww,Hh],[.03*Ww,Hh]])
+    dst=np.float32([[120,0],[840,0],[840,620],[120,620]])
+    M=cv2.getPerspectiveTransform(src,dst)
+    bird=cv2.warpPerspective(img,M,(960,620))
+    bird_edges=cv2.Canny(cv2.GaussianBlur(cv2.cvtColor(bird,cv2.COLOR_BGR2GRAY),(5,5),1.1),a.low,a.high)
+
+    road_pixels=mask>0
+    edge_density=float(np.count_nonzero(edge[road_pixels])/np.count_nonzero(road_pixels))
+    defect_ratio=float(sum(candidates)/np.count_nonzero(road_pixels)) if np.count_nonzero(road_pixels) else 0
+    mean_lane=float(np.mean(seg)) if seg else 0
+
+    outputs={
+        "01_grayscale.png":gray,"02_smoothed.png":blur,"03_gradient_energy.png":energy,
+        "04_edges.png":edge,"05_road_roi.png":roi,"06_lane_segments.png":lane_img,
+        "07_defect_candidates.png":defect_img,"08_defect_binary.png":binary,
+        "09_bird_eye_view.png":bird,"10_bird_eye_edges.png":bird_edges}
+    for name,value in outputs.items(): save(out/name,value)
+
+    text=(f"ROAD SURFACE AND LANE GEOMETRY SUMMARY\n"
+          f"=========================================\n"
+          f"Input dimensions: {img.shape[1]} x {img.shape[0]}\n"
+          f"Canny thresholds: {a.low}, {a.high}\n"
+          f"Mean road-region intensity: {float(gray[road_pixels].mean()):.2f}\n"
+          f"Road-region edge density: {edge_density:.4f}\n"
+          f"Candidate defect regions: {len(candidates)}\n"
+          f"Candidate defect area ratio: {defect_ratio:.4f}\n"
+          f"Lane-like Hough segments: {len(seg)}\n"
+          f"Mean retained segment length: {mean_lane:.2f} px\n")
+    (out/"summary.txt").write_text(text,encoding="utf-8")
+    print(text); print(f"Results saved to: {out.resolve()}")
+
+if __name__=="__main__": main()
