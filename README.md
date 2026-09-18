@@ -42,5 +42,4 @@ Hough segments are lane-like geometric candidates. Dark connected regions are on
 ## Reproducibility
 The sample image is included, so a fresh clone can execute the same experiment without downloading a dataset.
 
-## Academic use
-Run the project yourself, inspect the generated images and write your final observations based on your actual execution.
+
