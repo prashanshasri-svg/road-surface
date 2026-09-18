@@ -21,24 +21,6 @@ Road imagery contains useful structures such as lane boundaries and surface irre
 9. Report quantitative measurements.
 10. Keep execution entirely command-line based.
 
-## 4. System Architecture
-```text
-Input image
-   |
-Grayscale + Gaussian smoothing
-   |
-Canny edges
-   |
-   +--> ROI --> Hough lines --> lane candidates
-   |
-   +--> Local intensity difference --> threshold
-                                  --> morphology
-                                  --> contours
-   |
-   +--> Perspective transform --> bird's-eye view
-   |
-Quantitative summary
-```
 
 ## 5. Algorithm Details
 
