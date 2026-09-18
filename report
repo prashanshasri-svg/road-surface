@@ -10,61 +10,61 @@ This project develops a command-line Computer Vision pipeline for analysing a fo
 Road imagery contains useful structures such as lane boundaries and surface irregularities, but also contains irrelevant visual information. The objective is to create a lightweight classical Computer Vision workflow that isolates the road region, extracts geometric features and provides interpretable measurements.
 
 ## 3. Objectives
-1. Preprocess the input road image.
-2. Construct a road-region ROI.
-3. Detect edges using Canny.
-4. Detect lane-like structures using Hough transform.
-5. Identify candidate dark surface regions.
-6. Reduce noise with morphological operations.
-7. Extract candidate contours.
-8. Generate a bird's-eye view using perspective transformation.
-9. Report quantitative measurements.
-10. Keep execution entirely command-line based.
+1) Preprocess the input road image.
+2) Construct a road-region ROI.
+3) Detect edges using Canny.
+4) Detect lane-like structures using Hough transform.
+5) Identify candidate dark surface regions.
+6) Reduce noise with morphological operations.
+7) Extract candidate contours.
+8) Generate a bird's-eye view using perspective transformation.
+9) Report quantitative measurements.
+10) Keep execution entirely command-line based.
 
 
-## 5. Algorithm Details
+## 4. Algorithm Details
 
-### Gaussian smoothing
+Gaussian smoothing
 A 5x5 Gaussian filter reduces small-scale intensity variation.
 
-### Sobel gradient
+Sobel gradient
 Horizontal and vertical derivatives are calculated and combined into gradient magnitude.
 
-### Canny
+Canny
 Canny produces a binary edge map using lower and upper thresholds of 45 and 135 in the supplied experiment.
 
-### Region of Interest
+Region of Interest
 A trapezoidal mask approximates the visible road and reduces Hough responses from the background.
 
-### Hough transform
+Hough transform
 Probabilistic Hough detection returns line segments. Segments with non-horizontal orientation are retained as lane-like candidates.
 
-### Candidate defect segmentation
+Candidate defect segmentation
 The image is compared with a locally blurred version. Locally darker pixels are thresholded. Opening removes isolated noise and closing connects nearby responses. Contour area filtering removes very small and very large regions.
 
-### Perspective transformation
+Perspective transformation
 Four source points representing the road trapezoid are mapped to a rectangle. This creates a bird's-eye view and reduces perspective distortion.
 
-## 6. Quantitative Measures
+## 5. Quantitative Measures
 
-**Edge density**
+Edge density
 = edge pixels in ROI / total ROI pixels.
 
-**Candidate defect area ratio**
+Candidate defect area ratio
 = accepted candidate contour area / ROI area.
 
-**Mean line length**
+Mean line length
 = arithmetic mean of retained Hough segment lengths, where
 L = sqrt((x2-x1)^2 + (y2-y1)^2).
 
-## 7. Experimental Procedure
+## 6. Experimental Procedure
 Run:
 ```bash
 python src/main.py --input data/road_scene.jpg --output results
 ```
-Then record the values from `results/summary.txt`.
+Then I have record the values from `results/summary.txt`.
 
-## 8. Results
+## 7. Results
 
 Input width-960 px 
 Input height-640 px 
@@ -77,7 +77,7 @@ Lane-like Hough segments-14
 Mean retained segment length-211.29 px 
 
 
-## 9. Limitations
+## 8. Limitations
 - ROI coordinates are tuned for a forward-facing viewpoint.
 - Hough parameters are fixed.
 - Intensity-based candidates can confuse shadows with surface defects.
@@ -85,8 +85,8 @@ Mean retained segment length-211.29 px
 - The system does not semantically classify road damage.
 - It is a Computer Vision demonstration, not an autonomous-driving safety system.
 
-## 10. Future Scope
+## 9. Future Scope
 Automatic ROI estimation, lane polynomial fitting, vanishing-point detection, video temporal filtering, camera calibration, labelled defect evaluation.
 
-## 12. Conclusion
+## 10. Conclusion
 The project integrates preprocessing, edge information, geometric detection, morphology and projective transformation into one reproducible classical Computer Vision workflow. The intermediate outputs make the effect of each stage directly inspectable, while the numerical summary supports quantitative comparison.
