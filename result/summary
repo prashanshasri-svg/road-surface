@@ -1,0 +1,10 @@
+ROAD SURFACE AND LANE GEOMETRY SUMMARY
+=========================================
+Input dimensions: 960 x 640
+Canny thresholds: 45, 135
+Mean road-region intensity: 78.58
+Road-region edge density: 0.0091
+Candidate defect regions: 0
+Candidate defect area ratio: 0.0000
+Lane-like Hough segments: 14
+Mean retained segment length: 211.29 px
