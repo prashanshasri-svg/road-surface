@@ -4,10 +4,10 @@
 **Road Surface and Lane Geometry Analyzer Using Classical Computer Vision**
 
 ## 1. Abstract
-This project develops a command-line Computer Vision pipeline for analysing a forward-facing road scene. The system uses grayscale conversion, Gaussian smoothing, Sobel gradients and Canny edges before restricting geometric analysis to a road-shaped region of interest. Probabilistic Hough detection extracts lane-like line segments. A locally adaptive intensity difference followed by morphology and contour filtering identifies candidate surface irregularities. Finally, a perspective transformation produces a bird's-eye representation. Numerical measurements are reported for reproducible analysis.
+This project develops a command-line Computer Vision pipeline for analysing a forward-facing road scene. The system uses graayscale conversion, Gaussian smoothing, Sobel gradients and Canny edges before restricting geometric analysis to a road-shaped region of interest. Probabilistic Hough detection extracts lane-like line segments. A locally adaptive intensity difference followed by morphology and contour filtering identifies candidate surface irregularities. Finally, a perspective transformation produces a bird's-eye representation. Numerical measurements are reported for reproducible analysis.
 
 ## 2. Problem Statement
-Road imagery contains useful structures such as lane boundaries and surface irregularities, but also contains irrelevant visual information. The objective is to create a lightweight classical Computer Vision workflow that isolates the road region, extracts geometric features and provides interpretable measurements.
+Road imagery contains useful structures such as lane boundaries and surface irregularities, but also contains irrelevant visual information. The objective is to create a lightweight classical Computer Vision workflow that isolates the roasd region, extracts geometric features and provides interpretable measurements.
 
 ## 3. Objectives
 1) Preprocess the input road image.
