@@ -65,28 +65,19 @@ python src/main.py --input data/road_scene.jpg --output results
 Then record the values from `results/summary.txt`.
 
 ## 8. Results
-| Metric | Observed value |
-|---|---:|
-| Input width | 960 px |
-| Input height | 640 px |
-| Canny thresholds | 45, 135 |
-| Mean road-region intensity | 78.58 |
-| Road-region edge density | 0.0091 |
-| Candidate defect regions | 0 |
-| Candidate defect area ratio | 0.0000 |
-| Lane-like Hough segments | 14 |
-| Mean retained segment length | 211.29 px |
 
-## 9. Visual Analysis
-Insert screenshots from your execution and discuss:
-- how Gaussian smoothing changes the image;
-- whether Canny captures lane boundaries;
-- which Hough segments correspond to lanes;
-- which regions are identified as candidate defects;
-- how morphology changes the defect mask;
-- how the bird's-eye transformation changes road geometry.
+Input width-960 px 
+Input height-640 px 
+Canny thresholds-45, 135 
+Mean road-region intensity-78.58 
+Road-region edge density-0.0091 
+Candidate defect regions-0 
+Candidate defect area ratio-0.0000 
+Lane-like Hough segments-14 
+Mean retained segment length-211.29 px 
 
-## 10. Limitations
+
+## 9. Limitations
 - ROI coordinates are tuned for a forward-facing viewpoint.
 - Hough parameters are fixed.
 - Intensity-based candidates can confuse shadows with surface defects.
@@ -94,8 +85,8 @@ Insert screenshots from your execution and discuss:
 - The system does not semantically classify road damage.
 - It is a Computer Vision demonstration, not an autonomous-driving safety system.
 
-## 11. Future Scope
-Automatic ROI estimation, lane polynomial fitting, vanishing-point detection, video temporal filtering, camera calibration, labelled defect evaluation and comparison with learned detectors.
+## 10. Future Scope
+Automatic ROI estimation, lane polynomial fitting, vanishing-point detection, video temporal filtering, camera calibration, labelled defect evaluation.
 
 ## 12. Conclusion
 The project integrates preprocessing, edge information, geometric detection, morphology and projective transformation into one reproducible classical Computer Vision workflow. The intermediate outputs make the effect of each stage directly inspectable, while the numerical summary supports quantitative comparison.
